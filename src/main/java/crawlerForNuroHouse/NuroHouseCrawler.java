@@ -11,7 +11,6 @@ import org.openqa.selenium.support.ui.Select;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -21,8 +20,12 @@ public class NuroHouseCrawler {
 		try {
 			FileWriter file		= null;
 			PrintWriter pw		= null;
-			file = new FileWriter("C:\\Users\\makot\\Documents\\nuroHouse\\nuroHouseFindResult.csv", true);
+			file = new FileWriter("C:\\Users\\makot\\Documents\\nuroHouse\\nuroHouseFindResultAddress.csv", true);
 			pw = new PrintWriter(new BufferedWriter(file));
+			FileWriter file1	= null;
+			PrintWriter pw1		= null;
+			file1 = new FileWriter("C:\\Users\\makot\\Documents\\nuroHouse\\nuroHouseFindResultBuildingName.csv", true);
+			pw1 = new PrintWriter(new BufferedWriter(file1));
 			
 			try {
 				System.setProperty("webdriver.chrome.driver", "C:\\Program Files (x86)\\Google\\ChromeDriver78\\chromedriver.exe");
@@ -30,10 +33,9 @@ public class NuroHouseCrawler {
 				options.addArguments("--headless");
 				ChromeDriverService driverService = ChromeDriverService.createDefaultService();
 				WebDriver driver = new ChromeDriver(driverService, options);
-				driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
+				driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
 				
 				driver.get("https://nuro.jp/mansion/service/neworder/");
-//				WebElement prefSelectElement = driver.findElement(By.id("pref-list"));
 				Select dropDownPref = new Select(driver.findElement(By.id("pref-list")));
 				dropDownPref.selectByValue("25");
 				Select dropDownCity = new Select(driver.findElement(By.id("city-list")));
@@ -49,41 +51,21 @@ public class NuroHouseCrawler {
 					for (int j = 0; j < selectedTownMax; j++) {
 						townNumber = Integer.toString(j);
 						dropDownTown.selectByValue(townNumber);
-//						driver.findElement(By.id("buildings-list"));
 						String address = "";
 						String buildingName = "";
-						//TODO .findElements(By.cssSelector("p.item > span")　でNotFoundも含めてデータを取得すればよい。foreachで回せば何物件あるか知らなくてもいけるだろう。
-						String judgmentFoExist = driver.findElement(By.cssSelector("#items > p")).getText();
-						System.out.println(judgmentFoExist);
-						if (judgmentFoExist.contains("導入済みマンション")) {
-							address = "NotFound";
-							buildingName = "NotFound";
-							System.out.println(buildingName + " " + address);
-							pw.println(buildingName + "," + address);
-						}	else {
-							List<WebElement> buildingNumber = driver.findElements(By.id("items"));
-							for (WebElement building : buildingNumber) {
-								List<WebElement> buildingInfos = building.findElements(By.cssSelector("p.item > span"));
-								List<String> dataStock = new ArrayList<String>();
-								for (WebElement buildingInfo : buildingInfos) {
-									dataStock.add(buildingInfo.getText());
-								}
-								address = dataStock.get(0);
-								buildingName = dataStock.get(1);
-								pw.println(buildingName + "," + address);
-							}
-							
-//							for (int k = 1; k <= buildingNumber.size(); k++) {
-//								System.out.println(k);
-//								String xPathForAddress = "//*[@id=\"items\"]/p[" + k + "]/span[1]";
-//								System.out.println(xPathForAddress);
-//								String xPathForBuildingName = "//*[@id=\"items\"]/p[" + k + "]/span[2]";
-//								System.out.println(xPathForBuildingName);
-//								address = driver.findElement(By.xpath(xPathForAddress)).getText();
-//								buildingName = driver.findElement(By.xpath(xPathForBuildingName)).getText();
-//								pw.println(buildingName + "," + address);
-//							}
+						List<WebElement> buildingList = driver.findElements(By.cssSelector("#items > p > span.label"));
+						for (WebElement building : buildingList) {
+							address = building.getText();
+							System.out.println(address);
+							pw.println(address);
 						}
+						List<WebElement> buildingNameList = driver.findElements(By.cssSelector("#items > p > span.selectable"));
+						for (WebElement buildingNameElement : buildingNameList) {
+							buildingName = buildingNameElement.getText();
+							System.out.println(buildingName);
+							pw1.println(buildingName);
+						}
+						
 						try {
 							Thread.sleep(5);
 						}	catch (InterruptedException ie) {
