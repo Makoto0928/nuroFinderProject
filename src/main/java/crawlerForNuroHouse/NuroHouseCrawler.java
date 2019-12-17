@@ -19,15 +19,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 public class NuroHouseCrawler {
 	
 	private static String goeCodingApiKey() {
-		ResourceBundle rb = ResourceBundle.getBundle("googleGeocodingApi");
-		return rb.getString("apiKey");
+		Scanner scanner = new Scanner(System.in);
+		System.out.print("GoogleGeoCodingApiKey: ");
+		String googleGeoCodingApiKey = scanner.nextLine();
+		return googleGeoCodingApiKey;
 	}
 	private static GeoApiContext context = new GeoApiContext.Builder()
 			.apiKey(goeCodingApiKey())
@@ -38,6 +39,9 @@ public class NuroHouseCrawler {
 		
 		try {
 			Scanner scanner = new Scanner(System.in);
+			System.out.print("ChromeDriverPath: ");
+			String chromeDriverPath = scanner.nextLine();
+			
 			FileWriter file		= null;
 			PrintWriter pw		= null;
 			System.out.print("OutPutCsvFilePath: ");
@@ -52,9 +56,7 @@ public class NuroHouseCrawler {
 //			pw1 = new PrintWriter(new BufferedWriter(file1));
 			
 			try {
-				ResourceBundle rbChromeDriverFilePath = ResourceBundle.getBundle("webDriverFilePath");
-				String chromeDriverFilePath = rbChromeDriverFilePath.getString("webDriverPath.chromeDriverPath");
-				System.setProperty("webdriver.chrome.driver", chromeDriverFilePath);
+				System.setProperty("webdriver.chrome.driver", chromeDriverPath);
 				ChromeOptions options = new ChromeOptions();
 				options.addArguments("--headless");
 				ChromeDriverService driverService = ChromeDriverService.createDefaultService();

@@ -1,5 +1,2 @@
 # Default ignored files
 /workspace.xml
-# Custom ignored files
-src/main/resources/googleGeocodingApi.properties
-src/main/resources/webDriverFilePath.properties
