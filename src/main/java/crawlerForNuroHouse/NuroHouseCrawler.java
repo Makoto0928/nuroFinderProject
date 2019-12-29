@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 public class NuroHouseCrawler {
 	
+	/** set GeoCoding ApiKey */
 	private static String goeCodingApiKey() {
 		Scanner scanner = new Scanner(System.in);
 		System.out.print("GoogleGeoCodingApiKey: ");
@@ -99,32 +100,27 @@ public class NuroHouseCrawler {
 //							System.out.println(buildingName);
 //							pw1.println(buildingName);
 //						}
-						
-						try {
-							Thread.sleep(5);
-						}	catch (InterruptedException ie) {
-							System.out.println("Thread Sleep ERROR");
-							ie.printStackTrace();
-						}
-					}
-					try {
 						Thread.sleep(5);
-					}	catch (InterruptedException ie) {
-						System.out.println("Thread Sleep ERROR");
-						ie.printStackTrace();
 					}
+					Thread.sleep(5);
 				}
 				pw.close();
-				System.out.println("FINISH!");
-			}	catch (Exception e) {
-				System.out.println("==========Crawling Error ==========");
-				e.printStackTrace();
+				System.out.println("---------- FINISH! ----------");
+			}	catch (IOException ioE) {
+				System.out.println("========== Crawling ERROR ==========");
+				ioE.printStackTrace();
+			}	catch (InterruptedException irE) {
+				System.out.println("========== Thread Sleep ERROR ==========");
+				irE.printStackTrace();
+			}	catch (ApiException apiE) {
+				System.out.println("========== GoogleGeoCodingApi ERROR ==========");
+				apiE.printStackTrace();
 			}	finally {
 				pw.close();
 			}
-		}	catch (Exception ex) {
-			System.out.println("+++++ERROR+++++");
-			ex.printStackTrace();
+		}	catch (Exception e) {
+			System.out.println("++++++++++ ERROR ++++++++++");
+			e.printStackTrace();
 		}
 	}
 	
