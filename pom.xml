@@ -42,17 +42,27 @@
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>3.1.0</version>
 				<configuration>
+					<appendAssemblyId>false</appendAssemblyId>
 					<descriptorRefs>
-						<descriptorRef>bin</descriptorRef>
+						<!-- 依存するリソースをすべてjarに同梱する -->
+						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
+					<archive>
+						<manifest>
+							<!--mainClassタグ: パッケージ名.メインクラス名 -->
+							<mainClass>crawlerForNuroHouse.NuroHouseCrawler</mainClass>
+						</manifest>
+					</archive>
 				</configuration>
 				<executions>
 					<execution>
+						<!-- idタグは任意の文字列であれば何でもよい -->
 						<id>make-assembly</id>
-						<phase>package</phase> <!-- mvn package時実行 -->
+						<phase>package</phase>
 						<goals>
 							<goal>single</goal>
 						</goals>
