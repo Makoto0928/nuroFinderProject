@@ -36,92 +36,73 @@ public class NuroHouseCrawler {
 			.build();
 	
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws ApiException, InterruptedException, IOException{
 		
-		try {
-			Scanner scanner = new Scanner(System.in);
-			System.out.print("ChromeDriverPath: ");
-			String chromeDriverPath = scanner.nextLine();
-			
-			FileWriter file		= null;
-			PrintWriter pw		= null;
-			System.out.print("OutPutCsvFilePath: ");
-			String csvFilePathForAddress = scanner.nextLine();
-			file = new FileWriter(csvFilePathForAddress, true);
-			pw = new PrintWriter(new BufferedWriter(file));
-//			FileWriter file1	= null;
-//			PrintWriter pw1		= null;
-//			System.out.print("csvFilePathForBuildingName: ");
-//			String csvFilePathForBuildingName = scanner.nextLine();
-//			file1 = new FileWriter(csvFilePathForBuildingName, true);
-//			pw1 = new PrintWriter(new BufferedWriter(file1));
-			
-			try {
-				System.setProperty("webdriver.chrome.driver", chromeDriverPath);
-				ChromeOptions options = new ChromeOptions();
-				options.addArguments("--headless");
-				ChromeDriverService driverService = ChromeDriverService.createDefaultService();
-				WebDriver driver = new ChromeDriver(driverService, options);
-				driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
-				driver.get("https://nuro.jp/mansion/service/neworder/");
-				
-				// Only for Tokyo23
-				Select dropDownPref = new Select(driver.findElement(By.id("pref-list")));
-				dropDownPref.selectByValue("25");
-				Select dropDownCity = new Select(driver.findElement(By.id("city-list")));
-				String cityNumber = "";
-				int townValue[] = {115, 98, 117, 157, 68, 108, 104, 156, 130, 88, 216, 277, 80, 85, 139, 83, 113, 52, 134, 202, 269, 155, 201};
-				pw.println("Address,Lat,Lng");
-				System.out.println("Address,Lat,Lng");
-				for (int i = 0; i < 23; i++) {
-					cityNumber = Integer.toString(i);
-					dropDownCity.selectByValue(cityNumber);
-					Select dropDownTown = new Select(driver.findElement(By.id("town-list")));
-					int selectedTownMax = townValue[i];
-					String townNumber = "";
-					for (int j = 0; j < selectedTownMax; j++) {
-						townNumber = Integer.toString(j);
-						dropDownTown.selectByValue(townNumber);
-						String address = "";
+		Scanner scanner = new Scanner(System.in);
+		System.out.print("ChromeDriverPath: ");
+		String chromeDriverPath = scanner.nextLine();
+		
+		FileWriter file		= null;
+		PrintWriter pw		= null;
+		System.out.print("OutPutCsvFilePath: ");
+		String csvFilePathForAddress = scanner.nextLine();
+		file = new FileWriter(csvFilePathForAddress, true);
+		pw = new PrintWriter(new BufferedWriter(file));
+//		FileWriter file1	= null;
+//		PrintWriter pw1		= null;
+//		System.out.print("csvFilePathForBuildingName: ");
+//		String csvFilePathForBuildingName = scanner.nextLine();
+//		file1 = new FileWriter(csvFilePathForBuildingName, true);
+//		pw1 = new PrintWriter(new BufferedWriter(file1));
+		System.setProperty("webdriver.chrome.driver", chromeDriverPath);
+		ChromeOptions options = new ChromeOptions();
+		options.addArguments("--headless");
+		ChromeDriverService driverService = ChromeDriverService.createDefaultService();
+		WebDriver driver = new ChromeDriver(driverService, options);
+		driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
+		driver.get("https://nuro.jp/mansion/service/neworder/");
+		
+		// Only for Tokyo23
+		Select dropDownPref = new Select(driver.findElement(By.id("pref-list")));
+		dropDownPref.selectByValue("25");
+		Select dropDownCity = new Select(driver.findElement(By.id("city-list")));
+		String cityNumber = "";
+		int townValue[] = {115, 98, 117, 157, 68, 108, 104, 156, 130, 88, 216, 277, 80, 85, 139, 83, 113, 52, 134, 202, 269, 155, 201};
+		pw.println("Address,Lat,Lng");
+		System.out.println("Address,Lat,Lng");
+		for (int i = 0; i < 23; i++) {
+			cityNumber = Integer.toString(i);
+			dropDownCity.selectByValue(cityNumber);
+			Select dropDownTown = new Select(driver.findElement(By.id("town-list")));
+			int selectedTownMax = townValue[i];
+			String townNumber = "";
+			for (int j = 0; j < selectedTownMax; j++) {
+				townNumber = Integer.toString(j);
+				dropDownTown.selectByValue(townNumber);
+				String address = "";
 //						String buildingName = "";
-						List<WebElement> buildingList = driver.findElements(By.cssSelector("#items > p > span.label"));
-						for (WebElement building : buildingList) {
-							address = building.getText();
-							GeocodingResult[] results = getResults(address);
-							if (results != null && results.length > 0) {
-								LatLng latLng = results[0].geometry.location;
-								System.out.println("Address: " + address + ", " + "Lat: " + latLng.lat + ", " + "Lng: " + latLng.lng);
-								pw.println(address + "," + latLng.lat + "," + latLng.lng);
-							}
-						}
-//						List<WebElement> buildingNameList = driver.findElements(By.cssSelector("#items > p > span.selectable"));
-//						for (WebElement buildingNameElement : buildingNameList) {
-//							buildingName = buildingNameElement.getText();
-//							System.out.println(buildingName);
-//							pw1.println(buildingName);
-//						}
-						Thread.sleep(5);
+				List<WebElement> buildingList = driver.findElements(By.cssSelector("#items > p > span.label"));
+				for (WebElement building : buildingList) {
+					address = building.getText();
+					GeocodingResult[] results = getResults(address);
+					if (results != null && results.length > 0) {
+						LatLng latLng = results[0].geometry.location;
+						System.out.println("Address: " + address + ", " + "Lat: " + latLng.lat + ", " + "Lng: " + latLng.lng);
+						pw.println(address + "," + latLng.lat + "," + latLng.lng);
 					}
-					Thread.sleep(5);
 				}
-				pw.close();
-				System.out.println("---------- FINISH! ----------");
-			}	catch (IOException ioE) {
-				System.out.println("========== Crawling ERROR ==========");
-				ioE.printStackTrace();
-			}	catch (InterruptedException irE) {
-				System.out.println("========== Thread Sleep ERROR ==========");
-				irE.printStackTrace();
-			}	catch (ApiException apiE) {
-				System.out.println("========== GoogleGeoCodingApi ERROR ==========");
-				apiE.printStackTrace();
-			}	finally {
-				pw.close();
+//				List<WebElement> buildingNameList = driver.findElements(By.cssSelector("#items > p > span.selectable"));
+//				for (WebElement buildingNameElement : buildingNameList) {
+//					buildingName = buildingNameElement.getText();
+//					System.out.println(buildingName);
+//					pw1.println(buildingName);
+//				}
+				Thread.sleep(5);
 			}
-		}	catch (Exception e) {
-			System.out.println("++++++++++ ERROR ++++++++++");
-			e.printStackTrace();
+			Thread.sleep(5);
 		}
+		pw.close();
+		System.out.println("---------- FINISH! ----------");
 	}
 	
 	
