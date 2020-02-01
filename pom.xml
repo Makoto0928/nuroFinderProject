@@ -41,6 +41,7 @@
 	
 	<build>
 		<plugins>
+			<!-- 実行可能jarファイル用のプラグイン -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
